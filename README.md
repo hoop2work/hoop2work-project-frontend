@@ -1,2 +1,3 @@
-# hoop2work-project-frontend
-This is the frontend of our hoop2work project.
+npm i
+
+npm run dev
