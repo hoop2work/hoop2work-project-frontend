@@ -1,0 +1,83 @@
+[
+  {
+    "Wo hin": "Berlin",
+    "Kurze Description": "Hauptstadt Deutschlands mit vielen historischen Sehenswürdigkeiten.",
+    "Abflugzeit": "08:00",
+    "Ankunftzeit": "09:15",
+    "Rückflugzeit": "17:30",
+    "WiederZurückZeit": "18:45",
+    "image": "Berlin"
+  },
+  {
+    "Wo hin": "Paris",
+    "Kurze Description": "Romantische Stadt mit dem Eiffelturm und französischer Kultur.",
+    "Abflugzeit": "10:00",
+    "Ankunftzeit": "11:40",
+    "Rückflugzeit": "14:00",
+    "WiederZurückZeit": "15:30",
+    "image": "Paris"
+  },
+  {
+    "Wo hin": "Rom",
+    "Kurze Description": "Antike Stadt mit dem Kolosseum und dem Vatikan.",
+    "Abflugzeit": "07:15",
+    "Ankunftzeit": "09:45",
+    "Rückflugzeit": "19:00",
+    "WiederZurückZeit": "21:30",
+    "image": "Rom"
+  },
+  {
+    "Wo hin": "Barcelona",
+    "Kurze Description": "Lebendige Stadt mit einzigartiger Architektur von Gaudí.",
+    "Abflugzeit": "12:00",
+    "Ankunftzeit": "14:20",
+    "Rückflugzeit": "16:45",
+    "WiederZurückZeit": "19:05",
+    "image": "Barcelona"
+  },
+  {
+    "Wo hin": "Amsterdam",
+    "Kurze Description": "Fahrradfreundlich und berühmt für Grachten und Museen.",
+    "Abflugzeit": "06:30",
+    "Ankunftzeit": "08:00",
+    "Rückflugzeit": "20:15",
+    "WiederZurückZeit": "21:45",
+    "image": "Amsterdam"
+  },
+  {
+    "Wo hin": "Wien",
+    "Kurze Description": "Klassische Musik, Kaffeehauskultur und imperiale Geschichte.",
+    "Abflugzeit": "09:00",
+    "Ankunftzeit": "10:10",
+    "Rückflugzeit": "15:30",
+    "WiederZurückZeit": "16:40",
+    "image": "Wien"
+  },
+  {
+    "Wo hin": "Prag",
+    "Kurze Description": "Märchenhafte Altstadt mit viel Geschichte und Kultur.",
+    "Abflugzeit": "11:00",
+    "Ankunftzeit": "12:20",
+    "Rückflugzeit": "18:10",
+    "WiederZurückZeit": "19:30",
+    "image": "Prag"
+  },
+  {
+    "Wo hin": "Lissabon",
+    "Kurze Description": "Hügelige Hauptstadt mit Aussichtspunkten und Tramfahrten.",
+    "Abflugzeit": "13:45",
+    "Ankunftzeit": "16:30",
+    "Rückflugzeit": "10:00",
+    "WiederZurückZeit": "13:00",
+    "image": "Lissabon"
+  },
+  {
+    "Wo hin": "Kopenhagen",
+    "Kurze Description": "Moderne skandinavische Stadt mit Design, Fahrradkultur und Hygge.",
+    "Abflugzeit": "07:00",
+    "Ankunftzeit": "08:30",
+    "Rückflugzeit": "19:45",
+    "WiederZurückZeit": "21:15",
+    "image": "Kopenhagen"
+  }
+]
