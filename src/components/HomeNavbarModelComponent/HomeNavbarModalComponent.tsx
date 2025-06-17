@@ -97,19 +97,19 @@ export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
                                 {isLoggedIn && (
                                         <>
                                                 <div
-                                                        key="Buchungen"
-                                                        onClick={() => router.push("/buchungen")}
+                                                        key="Bookings"
+                                                        onClick={() => router.push("/bookings")}
                                                         style={{
                                                                 fontSize: "1rem",
                                                                 position: "relative",
                                                                 color: "#222",
-                                                                fontWeight: router.pathname === "/buchungen" ? 600 : 400,
+                                                                fontWeight: router.pathname === "/bookings" ? 600 : 400,
                                                                 cursor: "pointer",
                                                                 fontFamily: "'Indie Flower', cursive, sans-serif",
                                                         }}
                                                 >
-                                                        Buchungen
-                                                        {router.pathname === "/buchungen" && (
+                                                        bookings
+                                                        {router.pathname === "/bookings" && (
                                                                 <div
                                                                         style={{
                                                                                 height: "2px",
@@ -198,13 +198,12 @@ export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
                                             }}
                                             title="Profil"
                                         >
-                                            {/* Optional: Add an icon or initials here */}
                                         </div>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                         <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuItem>Settings</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => router.push('/settings')}>Settings</DropdownMenuItem>
                                         <DropdownMenuItem>.</DropdownMenuItem>
                                         <DropdownMenuItem>.</DropdownMenuItem>
                                         <DropdownMenuSeparator />
