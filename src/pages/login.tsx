@@ -1,3 +1,4 @@
+import { loginUser } from "@/ApiClient/Auth";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
@@ -6,10 +7,17 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState("");
     const router = useRouter();
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        alert(`Username: ${username}\nPassword: ${password}`);
-    };
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+        const result = await loginUser(username, password);
+        alert("Login erfolgreich!");
+        router.push("/");
+    } catch (error: any) {
+        alert(`Login fehlgeschlagen: ${error.message}`);
+    }
+};
 
     return (
         <>

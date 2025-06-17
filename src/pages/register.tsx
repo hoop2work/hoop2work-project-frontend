@@ -1,11 +1,12 @@
+import { registerUser } from "@/ApiClient/Auth";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 const Register: React.FC = () => {
     const router = useRouter();
     const [username, setUsername] = useState("");
-    const [firstname, setFirstname] = useState(""); 
-    const [lastname, setLastname] = useState("");
+    const [firstName, setFirstName] = useState(""); 
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [agb, setAgb] = useState(false);
@@ -15,23 +16,31 @@ const Register: React.FC = () => {
 
 
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!agb) {
-            alert("Bitte akzeptieren Sie die AGB's.");
-            return;
-        }   
-        alert(
-            `Username: ${username}\nFirstname: ${firstname}\nLastname: ${lastname}\nEmail: ${email}\nPassword: ${password}\nAGB: ${agb}\nNewsletter: ${newsletter}`
-        );
-        setUsername("");
-        setFirstname("");
-        setLastname("");
-        setEmail("");
-        setPassword("");
-        setAgb(false);
-        setNewsletter(false);
-    };
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!agb) {
+        alert("Bitte akzeptieren Sie die AGB's.");
+        return;
+    }
+
+    try {
+        const result = await registerUser({
+            username,
+            firstName,
+            lastName,
+            email,
+            password,
+            newsletter,
+        });
+
+        alert("Registrierung erfolgreich!");
+        router.push("/login"); // Weiterleitung zur Login-Seite nach Erfolg
+        
+    } catch (error: any) {
+        alert(`Registrierung fehlgeschlagen: ${error.message}`);
+    }
+};
 
     return (
         <>
@@ -105,16 +114,16 @@ const Register: React.FC = () => {
                             type="text"
                             name="firstname"
                             placeholder="Firstname"
-                            value={firstname}
-                            onChange={e => setFirstname(e.target.value)}
+                            value={firstName}
+                            onChange={e => setFirstName(e.target.value)}
                             autoComplete="given-name" />
                         <input
                             style={inputStyle}
                             type="text"
                             name="lastname"
                             placeholder="Lastname"
-                            value={lastname}
-                            onChange={e => setLastname(e.target.value)}
+                            value={lastName}
+                            onChange={e => setLastName(e.target.value)}
                             autoComplete="family-name" />
                         <input
                             style={inputStyle}
