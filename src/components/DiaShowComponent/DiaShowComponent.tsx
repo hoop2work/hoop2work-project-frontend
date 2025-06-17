@@ -25,15 +25,11 @@ const DiaShowComponent: React.FC = () => {
                 {images.map((src, index) => (
                 <CarouselItem key={index}>
                     <div className="p-2">
-                    <Card>
-                        <CardContent className="flex aspect-video items-center justify-center p-0 bg-transparent shadow-none border-none">
-                            <img
+                    <img
                                 src={src}
                                 alt={`Bild ${index + 1}`}
                                 className="w-full h-[300px] min-h-[200px] max-h-[400px] object-cover rounded"
                             />
-                        </CardContent>
-                    </Card>
                     </div>
                 </CarouselItem>
                 ))}
