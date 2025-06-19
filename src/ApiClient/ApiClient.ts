@@ -1,5 +1,23 @@
 const API_BASE_URL = "http://localhost:4000";
 
+// Utility to convert JS Date/string to SQL-compatible format
+function toSqlDateTime(date: Date | string): string {
+  const d = new Date(date);
+  const pad = (n: number, width: number = 2) =>
+    n.toString().padStart(width, "0");
+
+  const year = d.getFullYear();
+  const month = pad(d.getMonth() + 1);
+  const day = pad(d.getDate());
+  const hours = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  const seconds = pad(d.getSeconds());
+  const milliseconds = pad(d.getMilliseconds(), 3);
+  const microseconds = milliseconds + "000";
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${microseconds}`;
+}
+
 async function handleResponse(response: Response) {
   if (!response.ok) {
     const errorData = await response.json();
@@ -16,6 +34,8 @@ function getAuthHeaders() {
   };
 }
 
+export { toSqlDateTime };
+
 export async function getUserData() {
   const response = await fetch(`${API_BASE_URL}/auth/me`, {
     method: "GET",
@@ -24,17 +44,41 @@ export async function getUserData() {
   return handleResponse(response);
 }
 
-export async function getAllPredefinedMeetingRooms() {
-  const response = await fetch(`${API_BASE_URL}/api/predefined-meetingrooms`, {
+// =================== Trips ===================
+
+export async function getAllPredefinedTrips() {
+  const response = await fetch(`${API_BASE_URL}/api/trips/predefined`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
   return handleResponse(response);
 }
 
-export async function getPredefinedMeetingRoomById(id: number) {
+export async function getPredefinedTripById(id: number) {
+  const response = await fetch(`${API_BASE_URL}/api/trips/predefined/${id}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+}
+
+export async function createTripInstance(data: {
+  predefinedTripId: number;
+  teamId: number;
+  startDate: string;
+  endDate: string;
+}) {
+  const response = await fetch(`${API_BASE_URL}/api/trips/instances`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(response);
+}
+
+export async function getTripInstancesByTeam(teamId: number) {
   const response = await fetch(
-    `${API_BASE_URL}/api/predefined-meetingrooms/${id}`,
+    `${API_BASE_URL}/api/trips/instances/team/${teamId}`,
     {
       method: "GET",
       headers: getAuthHeaders(),
@@ -43,18 +87,182 @@ export async function getPredefinedMeetingRoomById(id: number) {
   return handleResponse(response);
 }
 
-export async function getAllPredefinedTrips() {
-  const response = await fetch(`${API_BASE_URL}/api/predefined-trips`, {
+export async function getTripInstancesByUser(userId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/trips/instances/user/${userId}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+export async function getTripInstanceById(id: number) {
+  const response = await fetch(`${API_BASE_URL}/api/trips/instances/${id}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
   return handleResponse(response);
 }
 
-export async function getPredefinedTripById(id: number) {
-  const response = await fetch(`${API_BASE_URL}/api/predefined-trips/${id}`, {
+export async function updateTripDates(
+  id: number,
+  data: {
+    startDate: string;
+    endDate: string;
+  }
+) {
+  const response = await fetch(`${API_BASE_URL}/api/trips/instances/${id}`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(response);
+}
+
+export async function addUserToTrip(tripId: number, userId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/trips/instances/${tripId}/users/${userId}`,
+    {
+      method: "POST",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+export async function removeUserFromTrip(tripId: number, userId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/trips/instances/${tripId}/users/${userId}`,
+    {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+export async function getUsersForTrip(tripId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/trips/instances/${tripId}/users`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+// =================== Teams ===================
+
+export async function getTeamById(id: number) {
+  const response = await fetch(`${API_BASE_URL}/api/teams/${id}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
   return handleResponse(response);
+}
+
+export async function getTeamsByUserId(userId: number) {
+  const response = await fetch(`${API_BASE_URL}/api/teams/user/${userId}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+}
+
+export async function getUsersByTeamId(teamId: number) {
+  const response = await fetch(`${API_BASE_URL}/api/teams/${teamId}/users`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+}
+
+export async function addUserToTeam(teamId: number, userId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/teams/${teamId}/users/${userId}`,
+    {
+      method: "POST",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+export async function removeUserFromTeam(teamId: number, userId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/teams/${teamId}/users/${userId}`,
+    {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+// =================== Meeting Room Instances ===================
+
+export async function createMeetingRoomInstance(data: object) {
+  const response = await fetch(`${API_BASE_URL}/api/meeting-room-instances`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(response);
+}
+
+export async function updateMeetingRoomBookingTimes(
+  id: number,
+  data: {
+    bookingStart: string;
+    bookingEnd: string;
+  }
+) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/meeting-room-instances/${id}`,
+    {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    }
+  );
+  return handleResponse(response);
+}
+
+export async function getMeetingRoomInstanceById(id: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/meeting-room-instances/${id}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+export async function getMeetingRoomInstancesByTrip(tripId: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/meeting-room-instances/by-trip/${tripId}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+  return handleResponse(response);
+}
+
+export async function deleteMeetingRoomInstance(id: number) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/meeting-room-instances/${id}`,
+    {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    }
+  );
+  if (!response.ok && response.status !== 204) {
+    throw new Error("Failed to delete meeting room instance");
+  }
+  return;
 }
