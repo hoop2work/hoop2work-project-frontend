@@ -26,10 +26,6 @@ export default function Trips() {
 
   return (
     <>
-      <Head>
-        <title>Trips - Hoop2Work</title>
-        <meta name="description" content="Trips page" />
-      </Head>
       <div className="min-h-screen flex flex-col">
         <HomeNavbar isLoggedIn={isLoggedIn} />
         <main className="flex-grow" >
