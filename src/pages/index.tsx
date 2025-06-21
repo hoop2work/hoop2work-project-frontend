@@ -13,6 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+        
     setIsLoggedIn(!!token);
 
     if (token) {
@@ -30,10 +31,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Head>
-        <title>Trips - Hoop2Work</title>
-        <meta name="description" content="Trips page" />
-      </Head>
       <HomeNavbar isLoggedIn={isLoggedIn} />
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         {isLoggedIn ? (
