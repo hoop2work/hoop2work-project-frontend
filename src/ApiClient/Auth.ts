@@ -41,5 +41,5 @@ export async function registerUser(user: {
     const errorData = await response.json();
     throw new Error(errorData.message || "Registration failed");
   }
-  return response.json(); // enthält z. B. { message: "User registered successfully" }
+  return response.json();
 }
