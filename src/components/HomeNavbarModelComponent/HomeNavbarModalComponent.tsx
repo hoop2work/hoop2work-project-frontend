@@ -2,16 +2,16 @@ import { useRouter } from "next/router";
 import React from "react";
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+        DropdownMenu,
+        DropdownMenuContent,
+        DropdownMenuItem,
+        DropdownMenuLabel,
+        DropdownMenuSeparator,
+        DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
 type HomeNavbarProps = {
-    isLoggedIn: boolean;
+        isLoggedIn: boolean;
 };
 
 export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
@@ -23,204 +23,59 @@ export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
                 window.location.reload();
         };
 
-        return (
-                <nav
-                        style={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                fontFamily: "'Indie Flower', cursive, sans-serif",
-                                padding: "20px 40px",
-                                paddingBottom: "20px",
-                                borderBottom: "1px solid #000000",
-                        }}
+        const navLink = (
+                label: string,
+                path: string,
+                extra?: string
+        ) => (
+                <div
+                        key={label}
+                        onClick={() => router.push(path)}
+                        className={`relative text-base cursor-pointer transition font-${router.pathname === path ? "semibold" : "normal"} text-gray-900 ${extra ?? ""}`}
                 >
-                        <div style={{ fontSize: "1.5rem", fontWeight: 600, letterSpacing: 1 }}>
-                                Hoop2Work
-                        </div>
+                        {label}
+                        {router.pathname === path && (
+                                <div className="absolute left-[15%] bottom-[-4px] h-0.5 w-[70%] bg-blue-500 rounded" />
+                        )}
+                </div>
+        );
 
-                        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-                                <div
-                                        key="Home"
-                                        onClick={() => router.push("/")}
-                                        style={{
-                                                fontSize: "1rem",
-                                                position: "relative",
-                                                color: "#222",
-                                                fontWeight: router.pathname === "/" ? 600 : 400,
-                                                cursor: "pointer",
-                                                fontFamily: "'Indie Flower', cursive, sans-serif",
-                                        }}
-                                >
-                                        Home
-                                        {router.pathname === "/" && (
-                                                <div
-                                                        style={{
-                                                                height: "2px",
-                                                                background: "#2196f3",
-                                                                width: "70%",
-                                                                position: "absolute",
-                                                                left: "15%",
-                                                                bottom: -4,
-                                                                borderRadius: 2,
-                                                        }}
-                                                />
-                                        )}
-                                </div>
-                                <div
-                                        key="Trips"
-                                        onClick={() => router.push("/trips")}
-                                        style={{
-                                                fontSize: "1rem",
-                                                position: "relative",
-                                                color: "#222",
-                                                fontWeight: router.pathname === "/trips" ? 600 : 400,
-                                                cursor: "pointer",
-                                                fontFamily: "'Indie Flower', cursive, sans-serif",
-                                        }}
-                                >
-                                        Trips
-                                        {router.pathname === "/trips" && (
-                                                <div
-                                                        style={{
-                                                                height: "2px",
-                                                                background: "#2196f3",
-                                                                width: "70%",
-                                                                position: "absolute",
-                                                                left: "15%",
-                                                                bottom: -4,
-                                                                borderRadius: 2,
-                                                        }}
-                                                />
-                                        )}
-                                </div>
+        return (
+                <nav className="flex items-center justify-between px-10 py-5 border-b border-black">
+                        <div className="text-2xl font-semibold tracking-wide">Hoop2Work</div>
+                        <div className="flex gap-6 items-center">
+                                {navLink("Home", "/")}
+                                {navLink("Trips", "/trips", "font-indie")}
                                 {isLoggedIn && (
                                         <>
-                                                <div
-                                                        key="Buchungen"
-                                                        onClick={() => router.push("/buchungen")}
-                                                        style={{
-                                                                fontSize: "1rem",
-                                                                position: "relative",
-                                                                color: "#222",
-                                                                fontWeight: router.pathname === "/buchungen" ? 600 : 400,
-                                                                cursor: "pointer",
-                                                                fontFamily: "'Indie Flower', cursive, sans-serif",
-                                                        }}
-                                                >
-                                                        Buchungen
-                                                        {router.pathname === "/buchungen" && (
-                                                                <div
-                                                                        style={{
-                                                                                height: "2px",
-                                                                                background: "#2196f3",
-                                                                                width: "70%",
-                                                                                position: "absolute",
-                                                                                left: "15%",
-                                                                                bottom: -4,
-                                                                                borderRadius: 2,
-                                                                        }}
-                                                                />
-                                                        )}
-                                                </div>
-                                                <div
-                                                        key="Team"
-                                                        onClick={() => router.push("/team")}
-                                                        style={{
-                                                                fontSize: "1rem",
-                                                                position: "relative",
-                                                                color: "#222",
-                                                                fontWeight: router.pathname === "/team" ? 600 : 400,
-                                                                cursor: "pointer",
-                                                                fontFamily: "'Indie Flower', cursive, sans-serif",
-                                                        }}
-                                                >
-                                                        Team
-                                                        {router.pathname === "/team" && (
-                                                                <div
-                                                                        style={{
-                                                                                height: "2px",
-                                                                                background: "#2196f3",
-                                                                                width: "70%",
-                                                                                position: "absolute",
-                                                                                left: "15%",
-                                                                                bottom: -4,
-                                                                                borderRadius: 2,
-                                                                        }}
-                                                                />
-                                                        )}
-                                                </div>
-                                                <div
-                                                        key="Costs"
-                                                        onClick={() => router.push("/costs")}
-                                                        style={{
-                                                                fontSize: "1rem",
-                                                                position: "relative",
-                                                                color: "#222",
-                                                                fontWeight: router.pathname === "/costs" ? 600 : 400,
-                                                                cursor: "pointer",
-                                                                fontFamily: "'Indie Flower', cursive, sans-serif",
-                                                        }}
-                                                >
-                                                        Costs
-                                                        {router.pathname === "/costs" && (
-                                                                <div
-                                                                        style={{
-                                                                                height: "2px",
-                                                                                background: "#2196f3",
-                                                                                width: "70%",
-                                                                                position: "absolute",
-                                                                                left: "15%",
-                                                                                bottom: -4,
-                                                                                borderRadius: 2,
-                                                                        }}
-                                                                />
-                                                        )}
-                                                </div>
+                                                {navLink("bookings", "/bookings", "font-indie")}
+                                                {navLink("Team", "/team", "font-indie")}
+                                                {navLink("Costs", "/costs", "font-indie")}
                                         </>
                                 )}
                         </div>
-
                         {isLoggedIn ? (
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <div
-                                            style={{
-                                                width: 32,
-                                                height: 32,
-                                                borderRadius: "50%",
-                                                background: "#90caf9",
-                                                border: "1px solid #2196f3",
-                                                cursor: "pointer",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                            title="Profil"
-                                        >
-                                            {/* Optional: Add an icon or initials here */}
-                                        </div>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                                        <DropdownMenuItem>.</DropdownMenuItem>
-                                        <DropdownMenuItem>.</DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem 
-                                        onClick={handleLogout}>Logout</DropdownMenuItem>
-                                    </DropdownMenuContent>
+                                        <DropdownMenuTrigger asChild>
+                                                <div
+                                                        className="w-8 h-8 rounded-full bg-blue-200 border border-blue-500 cursor-pointer flex items-center justify-center"
+                                                        title="Profil"
+                                                />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent>
+                                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem onClick={() => router.push('/settings')}>Settings</DropdownMenuItem>
+                                                <DropdownMenuItem>.</DropdownMenuItem>
+                                                <DropdownMenuItem>.</DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                                        </DropdownMenuContent>
                                 </DropdownMenu>
                         ) : (
                                 <div
                                         onClick={() => router.push("/login")}
-                                        style={{
-                                                fontSize: "1rem",
-                                                fontFamily: "'Indie Flower', cursive, sans-serif",
-                                                color: "#222",
-                                                cursor: "pointer",
-                                        }}
+                                        className="text-base text-gray-900 cursor-pointer"
                                 >
                                         Login
                                 </div>
