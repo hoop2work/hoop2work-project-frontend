@@ -1,5 +1,7 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 import {
         DropdownMenu,
@@ -16,11 +18,15 @@ type HomeNavbarProps = {
 
 export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
         const router = useRouter();
+        const [successMessage, setSuccessMessage] = useState("");
+        
 
         const handleLogout = () => {
                 localStorage.removeItem("token");
-                alert("You have been logged out.");
-                window.location.reload();
+                setSuccessMessage("You have been logged out.");
+                setTimeout(() => {
+                        window.location.reload();
+                }, 750);
         };
 
         const navLink = (
@@ -40,7 +46,7 @@ export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
                 </div>
         );
 
-        return (
+        return (<>
                 <nav className="flex items-center justify-between px-10 py-5 border-b border-black">
                         <div className="text-2xl font-semibold tracking-wide">Hoop2Work</div>
                         <div className="flex gap-6 items-center">
@@ -54,6 +60,7 @@ export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
                                         </>
                                 )}
                         </div>
+                       
                         {isLoggedIn ? (
                                 <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -80,6 +87,17 @@ export default function HomeNavbar({ isLoggedIn }: HomeNavbarProps) {
                                         Login
                                 </div>
                         )}
+                        
                 </nav>
+                 <div className="flex absolute top-0 p-4 justify-center w-full">
+                                {successMessage && (
+                                        <Alert className="py-1.5 px-4 rounded-lg text-sm min-w-[180px] max-w-[320px] shadow-md">
+                                                <Terminal className="h-4 w-4" />
+                                                <AlertTitle className="text-base">Success</AlertTitle>
+                                                <AlertDescription>{successMessage}</AlertDescription>
+                                        </Alert>
+                                )}
+                        </div>
+                </>
         );
 }

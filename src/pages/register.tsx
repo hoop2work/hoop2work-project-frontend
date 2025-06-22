@@ -1,5 +1,7 @@
 import { registerUser } from "@/ApiClient/Auth";
 import { useRouter } from "next/router";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 import React, { useState } from "react";
 
 const Register: React.FC = () => {
@@ -12,6 +14,8 @@ const Register: React.FC = () => {
     const [agb, setAgb] = useState(false);
     const [newsletter, setNewsletter] = useState(false);
     const [showAgbModal, setShowAgbModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
 
 
@@ -19,8 +23,38 @@ const Register: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validation
+    if (!username.trim()) {
+        setErrorMessage("Bitte geben Sie einen Benutzernamen ein.");
+        return;
+    }
+    if (!firstName.trim()) {
+        setErrorMessage("Bitte geben Sie Ihren Vornamen ein.");
+        return;
+    }
+    if (!lastName.trim()) {
+        setErrorMessage("Bitte geben Sie Ihren Nachnamen ein.");
+        return;
+    }
+    if (!email.trim()) {
+        setErrorMessage("Bitte geben Sie eine E-Mail-Adresse ein.");
+        return;
+    }
+    // Simple email regex for validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setErrorMessage("Bitte geben Sie eine gültige E-Mail-Adresse ein.");
+        return;
+    }
+    if (!password) {
+        setErrorMessage("Bitte geben Sie ein Passwort ein.");
+        return;
+    }
+    if (password.length < 6) {
+        setErrorMessage("Das Passwort muss mindestens 6 Zeichen lang sein.");
+        return;
+    }
     if (!agb) {
-        alert("Bitte akzeptieren Sie die AGB's.");
+        setErrorMessage("Bitte akzeptieren Sie die AGB's.");
         return;
     }
 
@@ -34,11 +68,13 @@ const Register: React.FC = () => {
             newsletter,
         });
 
-        alert("Registrierung erfolgreich!");
-        router.push("/login"); // Weiterleitung zur Login-Seite nach Erfolg
+        setSuccessMessage("Registrierung erfolgreich!");
+         setTimeout(() => {
+                router.push("/login");
+            }, 1000);
         
     } catch (error: any) {
-        alert(`Registrierung fehlgeschlagen: ${error.message}`);
+        setErrorMessage(`Registrierung fehlgeschlagen: ${error.message}`);
     }
 };
 
@@ -57,6 +93,22 @@ const Register: React.FC = () => {
                 <div style={{ fontSize: "1.5rem", fontWeight: 600, letterSpacing: 1 }}>
                     Hoop2Work
                 </div>
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 min-w-[220px] max-w-[320px] z-[1000] flex flex-col items-center gap-2">
+                                    {successMessage && (
+                                        <Alert className="py-1.5 px-4 rounded-lg text-sm min-w-[180px] max-w-[320px] shadow-md">
+                                            <Terminal className="h-4 w-4" />
+                                            <AlertTitle className="text-base">Success</AlertTitle>
+                                            <AlertDescription>{successMessage}</AlertDescription>
+                                        </Alert>
+                                    )}
+                                    {errorMessage && (
+                                        <Alert variant="destructive" className="py-1.5 px-4 rounded-lg text-sm min-w-[180px] max-w-[320px] shadow-md">
+                                            <Terminal className="h-4 w-4" />
+                                            <AlertTitle className="text-base">Error</AlertTitle>
+                                            <AlertDescription>{errorMessage}</AlertDescription>
+                                        </Alert>
+                                    )}
+                                </div>
             </nav>
             <div style={{
                 display: "flex",

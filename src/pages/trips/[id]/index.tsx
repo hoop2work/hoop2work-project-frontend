@@ -13,7 +13,16 @@ import AddMemberComponent from "@/components/AddMemberComponent/AddMemeberCompon
 import { Button } from "@/components/ui/button";
 import HomeNavbar from "@/components/HomeNavbarModelComponent/HomeNavbarModalComponent";
 import Footer from "@/components/FooterModelComponent/FooterModelComponent";
-import { getPredefinedTripById, createTripInstance, createMeetingRoomInstance, addUserToTrip } from "@/ApiClient/ApiClient";
+import {
+  getPredefinedTripById,
+  createTripInstance,
+  createMeetingRoomInstance,
+  addUserToTrip,
+  getAllPredefinedMeetingRooms,
+  getUserData,
+  getAllUsers,
+  getAllTeams,
+} from "@/ApiClient/ApiClient";
 import TimeOnly from "@/components/TimeOnlyComponent/TimeOnlyComponent";
 
 const TripDetailsPage = () => {
@@ -25,11 +34,15 @@ const TripDetailsPage = () => {
   const [memberFields, setMemberFields] = useState([0, 1, 2]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // POST-relevante Daten
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [selectedMeetingRoomId, setSelectedMeetingRoomId] = useState<number | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+  const [meetingRooms, setMeetingRooms] = useState<any[]>([]);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [teamId, setTeamId] = useState<number | null>(null);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
 
   const addField = () => {
     setMemberFields((prev) => [...prev, prev.length]);
@@ -38,6 +51,10 @@ const TripDetailsPage = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+    if (!token) {
+      window.location.href = "/login";
+      return;
+    }
 
     if (id) {
       getPredefinedTripById(Number(id))
@@ -50,6 +67,26 @@ const TripDetailsPage = () => {
           setIsLoading(false);
         });
     }
+
+    const fetchExtraData = async () => {
+      try {
+        const [meetingRoomsData, userData, allUsersData] = await Promise.all([
+          getAllPredefinedMeetingRooms(),
+          getUserData(),
+          getAllUsers(),
+        ]);
+        setMeetingRooms(meetingRoomsData);
+        setUser(userData);
+        setAllUsers(allUsersData);
+
+        const userTeams = await getAllTeams();
+        setTeams(userTeams);
+      } catch (error) {
+        console.error("Fehler beim Laden zusätzlicher Daten:", error);
+      }
+    };
+
+    fetchExtraData();
   }, [id]);
 
   function toIsoDate(dateStr: string): string {
@@ -57,49 +94,58 @@ const TripDetailsPage = () => {
   }
 
   const handleSubmit = async () => {
-  if (!trip || !startDate || !endDate || !selectedMeetingRoomId) {
-    alert("Bitte fülle alle Felder korrekt aus.");
-    return;
-  }
+    if (!trip || !startDate || !endDate || !selectedMeetingRoomId || !teamId) {
+      alert("Bitte fülle alle Felder korrekt aus.");
+      return;
+    }
 
-  const formattedStart = toIsoDate(startDate);
-  const formattedEnd = toIsoDate(endDate);
+    const formattedStart = toIsoDate(startDate);
+    const formattedEnd = toIsoDate(endDate);
 
-  try {
-    // 1. Trip-Instanz erstellen
-    const tripInstance = await createTripInstance({
+    // Log the data before submitting
+    console.log("Submitting trip with data:", {
       predefinedTripId: trip.id,
       teamId,
       startDate: formattedStart,
       endDate: formattedEnd,
+      selectedMeetingRoomId,
+      selectedUserIds,
     });
 
-    const tripInstanceId = tripInstance.id;
-    console.log("Trip-Instanz erstellt:", tripInstanceId);
+    try {
+      const tripInstance = await createTripInstance({
+        predefinedTripId: trip.id,
+        teamId,
+        startDate: formattedStart,
+        endDate: formattedEnd,
+      });
 
-    // 2. Meeting-Room-Instanz erstellen
-    await createMeetingRoomInstance({
-      trip_instance_id: tripInstanceId,
-      predefined_meeting_room_id: selectedMeetingRoomId,
-      booking_start: formattedStart,
-      booking_end: formattedEnd,
-    });
+      const tripInstanceId = tripInstance.id;
+      console.log("Meeting Room Payload:", {
+        trip_instance_id: tripInstanceId,
+        predefined_meeting_room_id: selectedMeetingRoomId,
+        booking_start: formattedStart,
+        booking_end: formattedEnd,
+      });
 
-    console.log("Meeting-Room-Instanz erstellt");
+      await createMeetingRoomInstance({
+        meetingRoom: { id: selectedMeetingRoomId },
+        tripInstance: { id: tripInstanceId },
+        bookingStart: formattedStart,
+        bookingEnd: formattedEnd,
+      });
 
-    // 3. Nutzer zum Trip hinzufügen
-    for (const userId of selectedUserIds) {
-      await addUserToTrip(tripInstanceId, userId);
+      for (const userId of selectedUserIds) {
+        await addUserToTrip(tripInstanceId, userId);
+      }
+
+      alert("Trip inklusive Meeting Room & Mitglieder erfolgreich erstellt!");
+      router.push("/some/success/page");
+    } catch (error) {
+      console.error("Fehler beim Erstellen:", error);
+      alert("Ein Fehler ist aufgetreten.");
     }
-
-    alert("Trip inklusive Meeting Room & Mitglieder erfolgreich erstellt!");
-    router.push("/some/success/page"); // ggf. weiterleiten
-  } catch (error) {
-    console.error("Fehler beim Erstellen:", error);
-    alert("Ein Fehler ist aufgetreten.");
-  }
-};
-
+  };
 
   if (isLoading || !trip) {
     return (
@@ -119,7 +165,9 @@ const TripDetailsPage = () => {
       <div className="flex flex-col items-center min-h-[calc(100vh-150px)] max-h-[calc(100vh-150px)] overflow-auto">
         <div className="flex flex-row items-center justify-center p-4 max-w-7xl mx-auto w-full gap-8">
           <div className="flex-1 flex flex-col gap-6">
-            <h1 className="text-3xl font-bold mb-2">Trip to: {trip.destination}</h1>
+            <h1 className="text-3xl font-bold mb-2">
+              Trip to: {trip.destination}
+            </h1>
             <div className="border border-gray-300 rounded-lg p-4 bg-white shadow mb-2">
               <p className="text-gray-700 mb-2">
                 <span className="font-semibold">Departure:</span>{" "}
@@ -145,12 +193,22 @@ const TripDetailsPage = () => {
 
             <div>
               <Label className="mb-1 block">Meeting room</Label>
-              <Select>
+              <Select onValueChange={(value) => setSelectedMeetingRoomId(Number(value))}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Theme" />
+                  <SelectValue placeholder="Select a Meeting Room" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="light">Light</SelectItem>
+                  {meetingRooms.length === 0 ? (
+                    <div className="px-4 py-2 text-gray-500">
+                      No meeting rooms available
+                    </div>
+                  ) : (
+                    meetingRooms.map((room) => (
+                      <SelectItem key={room.id} value={room.id.toString()}>
+                        {`Meeting Room: ${room.meetingRoomName}, ${room.availableSeats} seats, in ${room.city}`}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -158,7 +216,7 @@ const TripDetailsPage = () => {
 
           <div className="flex-1 flex justify-center items-center mx-4">
             <img
-              src={`/images/trips/${trip.pictureName || 'placeholder'}.jpg`}
+              src={`/images/trips/${trip.pictureName || "placeholder"}.jpg`}
               alt={`Trip to ${trip.destination}`}
               className="object-cover border-2 border-gray-400 rounded-lg shadow"
               onError={(e) => {
@@ -168,32 +226,48 @@ const TripDetailsPage = () => {
             />
           </div>
         </div>
-         <div className="flex flex-row items-center justify-center p-4 max-w-7xl mx-auto w-full"> 
+
+        <div className="flex flex-row items-center justify-center p-4 max-w-7xl mx-auto w-full">
           <div className="w-full">
             <Label className="text-lg mb-2 block">Team Trip</Label>
-            <Label className="text-xs mb-1 pl-1 block"></Label>
             <div className="space-y-3">
-              <Select>
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a Team" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {/* Dynamisch gefetchtes Team als <SelectItem> einfügen */}
-                    </SelectContent>
+              {teams.length === 0 ? (
+                <div className="px-4 py-2 text-gray-500">No teams available</div>
+              ) : (
+                <Select onValueChange={(value) => setTeamId(Number(value))}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a Team" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map((team) => (
+                      <SelectItem key={team.id} value={team.id.toString()}>
+                        {`Team: ${team.teamName}`}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
+              )}
             </div>
           </div>
         </div>
+
         <div className="flex flex-row items-center justify-center p-4 max-w-7xl mx-auto w-full">
-            
           <div className="w-full">
-            <Label className="text-lg mb-2 block">Team Trip</Label>
+            <Label className="text-lg mb-2 block">Team Members</Label>
             <Label className="text-xs mb-1 pl-1 block">Member's</Label>
             <div className="space-y-3">
               {memberFields.map((fieldId) => (
                 <div key={fieldId} className="flex items-center gap-2">
                   <div className="flex-1">
-                    <AddMemberComponent />
+                    <AddMemberComponent
+                      users={allUsers}
+                      onSelectUser={(userId) =>
+                        setSelectedUserIds((prev) => {
+                          if (prev.includes(userId)) return prev;
+                          return [...prev, userId];
+                        })
+                      }
+                    />
                   </div>
                   <Button
                     variant="outline"
