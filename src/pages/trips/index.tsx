@@ -17,7 +17,6 @@ export default function Trips() {
 
     getAllPredefinedTrips()
       .then((data) => {
-        console.log("Loaded trips:", data);
         setTrips(data);
       })
       .catch((err) => console.error("Error fetching trips:", err));

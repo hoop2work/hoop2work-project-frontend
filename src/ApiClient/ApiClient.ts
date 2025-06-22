@@ -18,13 +18,28 @@ function toSqlDateTime(date: Date | string): string {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${microseconds}`;
 }
 
-async function handleResponse(response: Response) {
+const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Fetching failed");
+    const text = await response.text(); // hol den Text, egal ob HTML oder leer
+    let errorMessage = "Etwas ist schiefgelaufen";
+
+    try {
+      const json = JSON.parse(text);
+      errorMessage = json.message || errorMessage;
+    } catch (e) {
+      // Kein JSON – ignoriere
+    }
+
+    throw new Error(errorMessage);
   }
-  return response.json();
-}
+
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return response.json(); // ✅ nur wenn JSON kommt
+  }
+
+  return null; // oder {} wenn du willst
+};
 
 function getAuthHeaders() {
   const token = localStorage.getItem("token");
@@ -38,6 +53,14 @@ export { toSqlDateTime };
 
 export async function getUserData() {
   const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+}
+
+export async function getAllUsers() {
+  const response = await fetch(`${API_BASE_URL}/auth/users`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -156,6 +179,14 @@ export async function getUsersForTrip(tripId: number) {
 
 // =================== Teams ===================
 
+export async function getAllTeams() {
+  const response = await fetch(`${API_BASE_URL}/api/teams`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+}
+
 export async function getTeamById(id: number) {
   const response = await fetch(`${API_BASE_URL}/api/teams/${id}`, {
     method: "GET",
@@ -203,6 +234,15 @@ export async function removeUserFromTeam(teamId: number, userId: number) {
 }
 
 // =================== Meeting Room Instances ===================
+
+
+export async function getAllPredefinedMeetingRooms() {
+  const response = await fetch(`${API_BASE_URL}/api/meeting-room-instances/predefined`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(response);
+}
 
 export async function createMeetingRoomInstance(data: object) {
   const response = await fetch(`${API_BASE_URL}/api/meeting-room-instances`, {
