@@ -21,9 +21,11 @@ import {
   getAllPredefinedMeetingRooms,
   getUserData,
   getAllUsers,
-  getAllTeams,
+  getTeamsByUserId,
 } from "@/ApiClient/ApiClient";
 import TimeOnly from "@/components/TimeOnlyComponent/TimeOnlyComponent";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 const TripDetailsPage = () => {
   const router = useRouter();
@@ -44,6 +46,8 @@ const TripDetailsPage = () => {
   const [teams, setTeams] = useState<any[]>([]);
   const [teamId, setTeamId] = useState<number | null>(null);
   const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [user, setUser] = useState<any>(null);
 
   const addField = () => {
@@ -81,7 +85,8 @@ const TripDetailsPage = () => {
         setUser(userData);
         setAllUsers(allUsersData);
 
-        const userTeams = await getAllTeams();
+        const _user = await getUserData();
+        const userTeams = await getTeamsByUserId(parseInt(_user.id));
         setTeams(userTeams);
       } catch (error) {
         console.error("Fehler beim Laden zusätzlicher Daten:", error);
@@ -97,7 +102,7 @@ const TripDetailsPage = () => {
 
   const handleSubmit = async () => {
     if (!trip || !startDate || !endDate || !selectedMeetingRoomId || !teamId) {
-      alert("Bitte fülle alle Felder korrekt aus.");
+      setErrorMessage("Bitte fülle alle Felder korrekt aus.");
       return;
     }
 
@@ -141,11 +146,13 @@ const TripDetailsPage = () => {
         await addUserToTrip(tripInstanceId, userId);
       }
 
-      alert("Trip inklusive Meeting Room & Mitglieder erfolgreich erstellt!");
-      router.push("/some/success/page");
+      setSuccessMessage(
+        "Trip inklusive Meeting Room & Mitglieder erfolgreich erstellt!"
+      );
+      router.push("/trips");
     } catch (error) {
       console.error("Fehler beim Erstellen:", error);
-      alert("Ein Fehler ist aufgetreten.");
+      setErrorMessage("Ein Fehler ist aufgetreten.");
     }
   };
 
@@ -165,6 +172,25 @@ const TripDetailsPage = () => {
     <>
       <HomeNavbar isLoggedIn={isLoggedIn} />
       <div className="flex flex-col items-center min-h-[calc(100vh-150px)] max-h-[calc(100vh-150px)] overflow-auto">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 min-w-[220px] max-w-[320px] z-[1000] flex flex-col items-center gap-2">
+          {successMessage && (
+            <Alert className="py-1.5 px-4 rounded-lg text-sm min-w-[180px] max-w-[320px] shadow-md">
+              <Terminal className="h-4 w-4" />
+              <AlertTitle className="text-base">Success</AlertTitle>
+              <AlertDescription>{successMessage}</AlertDescription>
+            </Alert>
+          )}
+          {errorMessage && (
+            <Alert
+              variant="destructive"
+              className="py-1.5 px-4 rounded-lg text-sm min-w-[180px] max-w-[320px] shadow-md"
+            >
+              <Terminal className="h-4 w-4" />
+              <AlertTitle className="text-base">Error</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+        </div>
         <div className="flex flex-row items-center justify-center p-4 max-w-7xl mx-auto w-full gap-8">
           <div className="flex-1 flex flex-col gap-6">
             <h1 className="text-3xl font-bold mb-2">
@@ -262,7 +288,7 @@ const TripDetailsPage = () => {
         <div className="flex flex-row items-center justify-center p-4 max-w-7xl mx-auto w-full">
           <div className="w-full">
             <Label className="text-lg mb-2 block">Team Members</Label>
-            <Label className="text-xs mb-1 pl-1 block">Member's</Label>
+            <Label className="text-xs mb-1 pl-1 block">Member&apos;s</Label>
             <div className="space-y-3">
               {memberFields.map((fieldId) => (
                 <div key={fieldId} className="flex items-center gap-2">

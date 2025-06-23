@@ -13,11 +13,10 @@ export default function Home() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-        
+
     setIsLoggedIn(!!token);
 
     if (token) {
-      // Fetch user data and set username
       (async () => {
         try {
           const data = await getUserData();
