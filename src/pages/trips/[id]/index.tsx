@@ -36,7 +36,9 @@ const TripDetailsPage = () => {
 
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [selectedMeetingRoomId, setSelectedMeetingRoomId] = useState<number | null>(null);
+  const [selectedMeetingRoomId, setSelectedMeetingRoomId] = useState<
+    number | null
+  >(null);
   const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
   const [meetingRooms, setMeetingRooms] = useState<any[]>([]);
   const [teams, setTeams] = useState<any[]>([]);
@@ -122,15 +124,15 @@ const TripDetailsPage = () => {
 
       const tripInstanceId = tripInstance.id;
       console.log("Meeting Room Payload:", {
-        trip_instance_id: tripInstanceId,
-        predefined_meeting_room_id: selectedMeetingRoomId,
-        booking_start: formattedStart,
-        booking_end: formattedEnd,
+        tripInstanceId: tripInstanceId,
+        predefinedMeetingRoomId: selectedMeetingRoomId,
+        bookingStart: formattedStart,
+        bookingEnd: formattedEnd,
       });
 
       await createMeetingRoomInstance({
-        meetingRoom: { id: selectedMeetingRoomId },
-        tripInstance: { id: tripInstanceId },
+        predefinedMeetingRoomId: selectedMeetingRoomId,
+        tripInstanceId: tripInstanceId,
         bookingStart: formattedStart,
         bookingEnd: formattedEnd,
       });
@@ -193,7 +195,11 @@ const TripDetailsPage = () => {
 
             <div>
               <Label className="mb-1 block">Meeting room</Label>
-              <Select onValueChange={(value) => setSelectedMeetingRoomId(Number(value))}>
+              <Select
+                onValueChange={(value) =>
+                  setSelectedMeetingRoomId(Number(value))
+                }
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a Meeting Room" />
                 </SelectTrigger>
@@ -232,7 +238,9 @@ const TripDetailsPage = () => {
             <Label className="text-lg mb-2 block">Team Trip</Label>
             <div className="space-y-3">
               {teams.length === 0 ? (
-                <div className="px-4 py-2 text-gray-500">No teams available</div>
+                <div className="px-4 py-2 text-gray-500">
+                  No teams available
+                </div>
               ) : (
                 <Select onValueChange={(value) => setTeamId(Number(value))}>
                   <SelectTrigger className="w-full">
