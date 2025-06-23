@@ -1,33 +1,37 @@
 const API_BASE_URL = "http://localhost:4000";
 
-// Utility to convert JS Date/string to SQL-compatible format
 function toSqlDateTime(date: Date | string): string {
   const d = new Date(date);
-  const pad = (n: number, width: number = 2) =>
-    n.toString().padStart(width, "0");
 
-  const year = d.getFullYear();
-  const month = pad(d.getMonth() + 1);
-  const day = pad(d.getDate());
-  const hours = pad(d.getHours());
-  const minutes = pad(d.getMinutes());
-  const seconds = pad(d.getSeconds());
-  const milliseconds = pad(d.getMilliseconds(), 3);
-  const microseconds = milliseconds + "000";
+  if (isNaN(d.getTime())) {
+    throw new Error("Invalid date");
+  }
+
+  const pad = (n: number, width = 2) => n.toString().padStart(width, "0");
+
+  const year = d.getUTCFullYear();
+  const month = pad(d.getUTCMonth() + 1);
+  const day = pad(d.getUTCDate());
+  const hours = pad(d.getUTCHours());
+  const minutes = pad(d.getUTCMinutes());
+  const seconds = pad(d.getUTCSeconds());
+  const milliseconds = pad(d.getUTCMilliseconds(), 3);
+  const microseconds = `${milliseconds}000`;
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${microseconds}`;
 }
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    const text = await response.text(); // hol den Text, egal ob HTML oder leer
+    const contentType = response.headers.get("content-type");
     let errorMessage = "Etwas ist schiefgelaufen";
 
-    try {
-      const json = JSON.parse(text);
+    if (contentType && contentType.includes("application/json")) {
+      const json = await response.json();
       errorMessage = json.message || errorMessage;
-    } catch (e) {
-      // Kein JSON – ignoriere
+    } else {
+      const text = await response.text();
+      errorMessage = text || errorMessage;
     }
 
     throw new Error(errorMessage);
@@ -35,10 +39,10 @@ const handleResponse = async (response: Response) => {
 
   const contentType = response.headers.get("content-type");
   if (contentType && contentType.includes("application/json")) {
-    return response.json(); // ✅ nur wenn JSON kommt
+    return response.json();
   }
 
-  return null; // oder {} wenn du willst
+  return null;
 };
 
 function getAuthHeaders() {
@@ -235,12 +239,14 @@ export async function removeUserFromTeam(teamId: number, userId: number) {
 
 // =================== Meeting Room Instances ===================
 
-
 export async function getAllPredefinedMeetingRooms() {
-  const response = await fetch(`${API_BASE_URL}/api/meeting-room-instances/predefined`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/api/meeting-room-instances/predefined`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
   return handleResponse(response);
 }
 
